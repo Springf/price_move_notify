@@ -10,14 +10,17 @@ def Handler(event, context):
     for p in monitor_list:
         ticker = yf.Ticker(p)
         #name = ticker.info['shortName']
-        history = ticker.history('1d');
-        price = round(history.Close[0],4)
-        date = history.index[0]
-        if(price <= monitor_list[p]):
-            msg = f'ATTN: {monitor_list_name[p]} closed at {price} on {date.strftime("%Y-%m-%d")} below {monitor_list[p]}'
+        history = ticker.history('1d')
+        if (not history.empty):
+            price = round(history.Close[-1],4)
+            date = history.index[-1]
+            if(price <= monitor_list[p]):
+                msg = f'ATTN: {monitor_list_name[p]} closed at {price} on {date.strftime("%Y-%m-%d")} below {monitor_list[p]}'
+            else:
+                msg = f'{monitor_list_name[p]} closed at {price} on {date.strftime("%Y-%m-%d")}'
+            message += msg + '\n'
         else:
-            msg = f'{monitor_list_name[p]} closed at {price} on {date.strftime("%Y-%m-%d")}'
-        message += msg + '\n'
+            message += f'{monitor_list_name[p]} has NO transaction on {date.strftime("%Y-%m-%d")}'
 
     print(message)
 
